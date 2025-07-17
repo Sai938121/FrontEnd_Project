@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>REGISTRATION & ATM Page</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
+  <style>
+    body {
+      background-color: yellow;
+      font-family: Arial, sans-serif;
+    }
+
+    .heading-box {
+      background-color: white;
+      border: 3px solid green;
+      padding: 10px;
+      text-align: center;
+      color: green;
+      font-size: 24px;
+      margin: 20px auto;
+      width: 300px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .form-container, .atm-section {
+      width: 300px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      background-color: green;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: darkgreen;
+    }
+
+    .success-message {
+      color: green;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .error-message {
+      color: red;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .atm-section h2 {
+      color: red;
+      text-align: center;
+    }
+
+    .balance-box {
+      border: 2px solid green;
+      padding: 10px;
+      background-color: #f0fff0;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .atm-section {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="heading-box">Registration</div>
+
+  <div class="form-container">
+    <form onsubmit="showWelcome(event)">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" maxlength="50" required>
+
+      <label for="age">Age:</label>
+      <input type="number" id="age" name="age" min="18" required>
+
+      <label for="city">City:</label>
+      <select id="city" name="city" required>
+        <option value="">Select City</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Bangalore">Bangalore</option>
+        <option value="Hyderabad">Hyderabad</option>
+        <option value="Chennai">Chennai</option>
+        <option value="Kolkata">Kolkata</option>
+        <option value="Ahmedabad">Ahmedabad</option>
+        <option value="Pune">Pune</option>
+      </select>
+
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" required>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div class="success-message" id="welcomeMessage"></div>
+    <div class="error-message" id="errorMessage"></div>
+  </div>
+
+  <div class="atm-section" id="atmSection">
+    <h2>ATM</h2>
+
+    <!-- ✅ Current Balance moved ABOVE the withdrawal input -->
+    <div class="balance-box">
+      Current Balance: ₹<span id="currentBalance">10000</span>
+    </div>
+
+    <label for="withdraw">How much money you want to withdraw:</label>
+    <input type="number" id="withdraw" name="withdraw" required>
+
+    <button onclick="withdrawMoney()">Proceed</button>
+
+    <div class="success-message" id="withdrawMessage"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+  <script>
+    let balance = 10000;
+
+    const cityDropdown = new Choices('#city', {
+      searchEnabled: true,
+      itemSelectText: '',
+      shouldSort: false
+    });
+
+    function showWelcome(event) {
+      event.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const age = parseInt(document.getElementById("age").value);
+      const city = document.getElementById("city").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const welcomeMessage = document.getElementById("welcomeMessage");
+      const errorMessage = document.getElementById("errorMessage");
+      const atmSection = document.getElementById("atmSection");
+
+      const isAlphanumeric = /^[a-zA-Z0-9 ]{1,50}$/.test(name);
+      const validCities = ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Ahmedabad", "Pune"];
+
+      if (!isAlphanumeric) {
+        errorMessage.textContent = "Name must be alphanumeric and up to 50 characters.";
+        welcomeMessage.textContent = "";
+        return;
+      }
+
+      if (isNaN(age) || age < 18) {
+        errorMessage.textContent = "Age must be 18 or above.";
+        welcomeMessage.textContent = "";
+        return;
+      }
+
+      if (!validCities.includes(city)) {
+        errorMessage.textContent = "City not available.";
+        welcomeMessage.textContent = "";
+        return;
+      }
+
+      if (address === "") {
+        errorMessage.textContent = "Address is required.";
+        welcomeMessage.textContent = "";
+        return;
+      }
+
+      errorMessage.textContent = "";
+      welcomeMessage.textContent = `Welcome, ${name}!`;a
+      atmSection.style.display = "block";
+    }
+
+    function withdrawMoney() {
+      const withdrawAmount = parseInt(document.getElementById("withdraw").value);
+      const withdrawMessage = document.getElementById("withdrawMessage");
+
+      if (!isNaN(withdrawAmount) && withdrawAmount > 0 && withdrawAmount <= balance) {
+        balance -= withdrawAmount;
+        document.getElementById("currentBalance").textContent = balance;
+        withdrawMessage.textContent = "Withdrawal successful!";
+        withdrawMessage.style.color = "green";
+      } else {
+        withdrawMessage.textContent = "Invalid amount or insufficient funds!";
+        withdrawMessage.style.color = "red";
+      }
+    }
+  </script>
+</body>
+</html>
+
+
